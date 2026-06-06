@@ -23,10 +23,20 @@ graph: dict[str, set[str]]
 
 之后我们会加以下组合（即论文的第二版，对应`WN_all = synonyms + hypernyms + hyponyms`）
 
+Version 2:
 ```python
 GloVe 6B 300d + English WordNet synonyms + hypernyms + hyponyms
 ```
 
+Version 3:
+```python
+GloVe 6B 300d + PPDB
+```
+
+Version 4:
+```python
+GloVe 6B 300d + WordNet + PPDB
+```
 ### Files
 
 ```text
