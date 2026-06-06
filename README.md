@@ -33,7 +33,7 @@ Version 3:
 GloVe 6B 300d + PPDB
 ```
 
-Version 4:
+Or Version 4:
 ```python
 GloVe 6B 300d + WordNet + PPDB
 ```
