@@ -94,3 +94,145 @@ Run the full version with:
 ```bash
 python3 prepare_wn_syn.py
 ```
+
+----------------------------07/06/2025_update------------------------------
+
+## Core Retrofitting Implementation
+
+The current pipeline uses:
+
+- GloVe 6B 300-dimensional English embeddings;
+- an English WordNet graph;
+- synonym relations only for the current baseline;
+- vocabulary filtering before retrofitting;
+- synchronous iterative vector updates.
+
+### Team Responsibilities
+
+- Person A: loads GloVe embeddings, constructs the WordNet graph, and filters the graph by the embedding vocabulary.
+- Person B: implements and verifies the core retrofitting algorithm.
+- Person C / the group: conducts later evaluation and comparison between original and retrofitted embeddings.
+
+### Person B Interface
+
+python from src.retrofit import retrofit_vectors  retrofitted_vectors, stats = retrofit_vectors(     original_vectors,     graph,     num_iters=10,     alpha=1.0,     beta_strategy="inverse_degree", ) 
+
+Expected inputs:
+
+python original_vectors: dict[str, np.ndarray] graph: dict[str, Collection[str]] 
+
+Returned outputs:
+
+python retrofitted_vectors: dict[str, np.ndarray] stats: dict[str, int] 
+
+The returned statistics include:
+
+- oov_neighbours_skipped
+- words_with_no_valid_neighbours
+- words_updated
+- words_unchanged
+
+### Implementation Properties
+
+The current implementation:
+
+- uses synchronous updates;
+- reads neighbour vectors only from the previous iteration;
+- does not modify the original input vectors in place;
+- skips out-of-vocabulary neighbours;
+- leaves words without valid neighbours unchanged;
+- supports neighbour collections such as set[str];
+- uses inverse-degree neighbour weighting;
+- preserves the complete input vocabulary and vector dimensions.
+
+### Tests
+
+Run the test suite from the project root:
+
+bash cd ~/Desktop/nlp-retrofitting-project .venv/bin/python -m pytest 
+
+Current verified result:
+
+text 7 passed 
+
+The tests cover:
+
+1. semantic neighbours become closer;
+2. isolated words remain unchanged;
+3. original vectors are not modified;
+4. out-of-vocabulary neighbours are skipped;
+5. updates are synchronous;
+6. inverse-degree weighting works with multiple neighbours;
+7. graph neighbour values may be stored as sets.
+
+### Real-Data Integration
+
+The real-data integration runner is:
+
+text scripts/04_run_wn_syn_retrofit.py 
+
+Example:
+
+bash .venv/bin/python scripts/04_run_wn_syn_retrofit.py \   --max-words 1000 \   --num-iters 1 
+
+The script:
+
+- loads a configurable prefix of the GloVe file;
+- builds a WordNet synonym graph;
+- filters the graph by the embedding vocabulary;
+- calls the core retrofitting implementation;
+- verifies vocabulary and dimensional consistency;
+- checks that sampled original vectors were not modified;
+- checks that all input and output vectors contain only finite values;
+- prints deterministic sample diagnostics and runtime information.
+
+### Verified Configurations
+
+The following configurations have completed successfully:
+
+| Vocabulary | Iterations | Graph nodes | Undirected edges | Result |
+|---:|---:|---:|---:|---|
+| 1,000 | 1 | 595 | 1,232 | Passed |
+| 1,000 | 10 | 595 | 1,232 | Passed |
+| 50,000 | 1 | 25,616 | 80,232 | Passed |
+| 50,000 | 10 | 25,616 | 80,232 | Passed |
+
+For the 50,000-word, 10-iteration run:
+
+text words updated: 25,616 words unchanged: 24,384 all input vectors finite: passed all output vectors finite: passed peak memory: approximately 1.10 GB 
+
+These runs verify implementation correctness, numerical stability, and scalability at the tested sizes. They do not yet demonstrate that retrofitting improves embedding quality.
+
+### Data Setup
+
+The pretrained GloVe file is not included in this repository.
+
+Place the following file at:
+
+text models/glove.6B.300d.txt 
+
+The current source is GloVe 6B, trained on Wikipedia 2014 and Gigaword 5, with 300-dimensional uncased vectors.
+
+The current WordNet configuration is:
+
+text include_synonyms=True include_hypernyms=False include_hyponyms=False 
+
+### Current Limitations
+
+- The current experiments use prefixes of the GloVe file rather than random vocabulary samples.
+- GloVe vectors are currently not L2-normalized before retrofitting.
+- WordNet relations are aggregated across word senses, which may introduce polysemy-related noise.
+- oov_after_filtering = 0 only describes the graph after vocabulary filtering.
+- The current dictionary-based float64 representation has substantial memory overhead.
+- The full 400,000-word vocabulary has not been tested.
+- Original-versus-retrofitted evaluation has not yet been completed.
+- Retrofitted vectors are not yet saved because the output format and vocabulary-order contract must first be agreed with the evaluation member.
+
+### Next Steps
+
+1. Agree on an output format and vocabulary-order contract.
+2. Save and reload a small retrofitted output as a round-trip test.
+3. Provide original and retrofitted embeddings to the evaluation pipeline.
+4. Establish an original-GloVe baseline.
+5. Compare controlled configurations such as iteration count, normalization policy, lexical relation types, and weighting strategies.
+6. Conduct error analysis for noisy WordNet edges.
