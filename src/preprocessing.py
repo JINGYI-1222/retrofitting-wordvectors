@@ -1,28 +1,6 @@
 from collections import defaultdict
 from pathlib import Path
 
-
-def load_lexicon_edges(path: str | Path) -> dict[str, set[str]]:
-    """Load a simple two-column lexicon file as an undirected graph."""
-    graph = defaultdict(set)
-    path = Path(path)
-
-    with path.open("r", encoding="utf-8") as handle:
-        for line in handle:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-
-            word_a, word_b = line.split("\t")[:2]
-            if word_a == word_b:
-                continue
-
-            graph[word_a].add(word_b)
-            graph[word_b].add(word_a)
-
-    return dict(graph)
-
-
 def build_wordnet_graph(
     vocab: set[str],
     include_synonyms: bool = True,
