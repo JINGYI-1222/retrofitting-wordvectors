@@ -217,25 +217,6 @@ The current WordNet configuration is:
 
 text include_synonyms=True include_hypernyms=False include_hyponyms=False 
 
-### Current Limitations
-
-- The current experiments use prefixes of the GloVe file rather than random vocabulary samples.
-- GloVe vectors are currently not L2-normalized before retrofitting.
-- WordNet relations are aggregated across word senses, which may introduce polysemy-related noise.
-- oov_after_filtering = 0 only describes the graph after vocabulary filtering.
-- The current dictionary-based float64 representation has substantial memory overhead.
-- The full 400,000-word vocabulary has not been tested.
-- Original-versus-retrofitted evaluation has not yet been completed.
-- Retrofitted vectors are not yet saved because the output format and vocabulary-order contract must first be agreed with the evaluation member.
-
-### Next Steps
-
-1. Agree on an output format and vocabulary-order contract.
-2. Save and reload a small retrofitted output as a round-trip test.
-3. Provide original and retrofitted embeddings to the evaluation pipeline.
-4. Establish an original-GloVe baseline.
-5. Compare controlled configurations such as iteration count, normalization policy, lexical relation types, and weighting strategies.
-6. Conduct error analysis for noisy WordNet edges.
 
 ---
 
