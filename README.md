@@ -6,7 +6,7 @@ This project reproduces the retrofitting method from Faruqui et al. (2015).
 
 This module prepares the data for retrofitting.
 
-The first version uses（即论文第一版，对应`WN_syn = synonyms only`）:
+The first version uses（`WN_syn = synonyms only`）:
 
 ```text
 GloVe 6B 300d + English WordNet synonyms
@@ -21,7 +21,7 @@ embeddings: dict[str, np.ndarray]
 graph: dict[str, set[str]]
 ```
 
-之后我们会加以下组合（即论文的第二版，对应`WN_all = synonyms + hypernyms + hyponyms`）
+之后我们会加以下组合（`WN_all = synonyms + hypernyms + hyponyms`）
 
 Version 2:
 ```python
@@ -61,7 +61,7 @@ Extract this file:
 glove.6B.300d.txt
 ```
 
-Place it at （需要你们手动下载，然后放在models文件夹里:）
+Place it at models:
 
 ```text
 models/glove.6B.300d.txt
