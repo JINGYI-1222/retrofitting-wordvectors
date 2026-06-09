@@ -6,8 +6,9 @@ def build_wordnet_graph(
     include_synonyms: bool = True,
     include_hypernyms: bool = False,
     include_hyponyms: bool = False,
+    keep_only_vocab: bool = True,
 ) -> dict[str, set[str]]:
-    """Build a WordNet graph, keeping only words that appear in the embedding vocabulary."""
+    """Build a WordNet graph from words in the embedding vocabulary."""
     try:
         from nltk.corpus import wordnet as wn
     except ImportError as exc:
@@ -33,7 +34,9 @@ def build_wordnet_graph(
                     related_words.update(_lemma_words(hyponym))
 
         for related_word in related_words:
-            if related_word == word or related_word not in normalized_vocab:
+            if related_word == word:
+                continue
+            if keep_only_vocab and related_word not in normalized_vocab:
                 continue
             graph[word].add(related_word)
             graph[related_word].add(word)
