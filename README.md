@@ -236,3 +236,74 @@ text include_synonyms=True include_hypernyms=False include_hyponyms=False
 4. Establish an original-GloVe baseline.
 5. Compare controlled configurations such as iteration count, normalization policy, lexical relation types, and weighting strategies.
 6. Conduct error analysis for noisy WordNet edges.
+
+---
+
+## PART C. Evaluation
+
+This module evaluates the quality of original and retrofitted word vectors.
+
+### Files
+
+```text
+src/eval.py        # word similarity evaluation: WS-353, SimLex-999, RG-65
+src/eval_sst.py    # sentiment analysis evaluation: SST-2 (auto-downloaded from HuggingFace)
+datasets/combined.csv      # WS-353 (353 word pairs, human similarity scores)
+datasets/SimLex-999.txt    # SimLex-999 (999 word pairs, semantic similarity)
+datasets/rg65.txt          # RG-65 (65 word pairs, Rubenstein & Goodenough 1965)
+```
+
+### Evaluation Datasets
+
+| Dataset | Pairs | Score range | Focus |
+|---------|-------|-------------|-------|
+| WS-353 | 353 | 0–10 | General word relatedness |
+| SimLex-999 | 999 | 0–10 | Semantic similarity only |
+| RG-65 | 65 | 0–4 | Classic semantic similarity benchmark |
+| SST-2 | 67,349 train / 872 val | binary | Sentiment classification |
+
+### Word Similarity Evaluation
+
+For each dataset, we compute cosine similarity between word pairs using both original and retrofitted vectors, then measure Spearman rho correlation with human-annotated scores.
+
+Run:
+
+```bash
+python src/eval.py
+```
+
+Results (GloVe 6B 300d, 50,000 words, 10 iterations, WordNet synonyms):
+
+| Dataset | Original GloVe | Retrofitted | Δ |
+|---------|---------------|-------------|---|
+| WS-353 | 0.631 | 0.645 | +0.014 |
+| SimLex-999 | 0.372 | 0.443 | +0.071 |
+| RG-65 | 0.793 | 0.820 | +0.027 |
+
+### Sentiment Analysis Evaluation
+
+Sentences are represented as the average of their word vectors. A logistic regression classifier is trained on SST-2 and evaluated on the validation set.
+
+Run:
+
+```bash
+python src/eval_sst.py
+```
+
+Results:
+
+| | Accuracy |
+|--|----------|
+| Original GloVe | 76.61% |
+| Retrofitted | 78.21% |
+| Improvement | +1.60% |
+
+### Coverage
+
+We load the first 50,000 words from GloVe. Coverage on evaluation datasets:
+
+- WS-353: 348/353 (98.6%)
+- SimLex-999: 995/999 (99.6%)
+- RG-65: 61/65 (93.8%)
+
+Missing pairs are skipped; results remain reliable.
