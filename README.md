@@ -21,7 +21,7 @@ embeddings: dict[str, np.ndarray]
 graph: dict[str, set[str]]
 ```
 
-之后我们会加以下组合（`WN_all = synonyms + hypernyms + hyponyms`）
+After we will add（`WN_all = synonyms + hypernyms + hyponyms`）
 
 Version 2:
 ```python
