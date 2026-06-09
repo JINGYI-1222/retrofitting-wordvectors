@@ -35,21 +35,28 @@ def main():
     print("Loaded embeddings:", len(embeddings))
 
     print("Building WordNet synonym graph...")
-    graph = build_wordnet_graph(
+    raw_graph = build_wordnet_graph(
         vocab,
         include_synonyms=True,
         include_hypernyms=False,
         include_hyponyms=False,
+        keep_only_vocab=False,
     )
+    raw_stats = report_oov(raw_graph, embeddings)
+    raw_edge_count = sum(len(neighbors) for neighbors in raw_graph.values()) // 2
+
+    print("Raw WN_syn graph nodes:", len(raw_graph))
+    print("Raw WN_syn graph edges:", raw_edge_count)
+    print("OOV before filtering:", raw_stats)
 
     print("Filtering graph by embedding vocabulary...")
-    graph = filter_graph_by_vocab(graph, vocab)
+    graph = filter_graph_by_vocab(raw_graph, vocab)
     stats = report_oov(graph, embeddings)
 
     edge_count = sum(len(neighbors) for neighbors in graph.values()) // 2
-    print("WN_syn graph nodes:", len(graph))
-    print("WN_syn graph edges:", edge_count)
-    print("OOV report:", stats)
+    print("Filtered WN_syn graph nodes:", len(graph))
+    print("Filtered WN_syn graph edges:", edge_count)
+    print("OOV after filtering:", stats)
 
     print()
     print("Data objects ready for retrofitting:")
