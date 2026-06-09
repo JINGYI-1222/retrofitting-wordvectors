@@ -7,7 +7,7 @@ def build_wordnet_graph(
     include_hypernyms: bool = False,
     include_hyponyms: bool = False,
 ) -> dict[str, set[str]]:
-    """Build a WordNet graph, keeping only words that are in our vocabulary."""
+    """Build a WordNet graph, keeping only words that appear in the embedding vocabulary."""
     try:
         from nltk.corpus import wordnet as wn
     except ImportError as exc:
