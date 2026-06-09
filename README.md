@@ -43,7 +43,7 @@ GloVe 6B 300d + WordNet + PPDB
 src/utils.py              # load embeddings, save embeddings, cosine similarity
 src/preprocessing.py      # build WordNet graph, filter OOV words
 
-prepare_wn_syn.py         # checks full GloVe 300d + WordNet synonyms, 之后哲兮可以融到main.py，然后删掉
+prepare_wn_syn.py         # checks full GloVe 300d + WordNet synonyms, we can merge it at the end
 ```
 
 ### Data Source
