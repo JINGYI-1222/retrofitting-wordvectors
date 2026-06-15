@@ -21,29 +21,14 @@ embeddings: dict[str, np.ndarray]
 graph: dict[str, set[str]]
 ```
 
-After we will add（`WN_all = synonyms + hypernyms + hyponyms`）
 
-Version 2:
-```python
-GloVe 6B 300d + English WordNet synonyms + hypernyms + hyponyms
-```
-
-Version 3:
-```python
-GloVe 6B 300d + PPDB
-```
-
-Or Version 4:
-```python
-GloVe 6B 300d + WordNet + PPDB
-```
 ### Files
 
 ```text
 src/utils.py              # load embeddings, save embeddings, cosine similarity
 src/preprocessing.py      # build WordNet graph, filter OOV words
 
-prepare_wn_syn.py         # checks full GloVe 300d + WordNet synonyms, we can merge it at the end
+prepare_wordnet.py         # checks full GloVe 300d + WordNet synonyms/all, we can merge it at the end
 ```
 
 ### Data Source
@@ -81,20 +66,26 @@ In this first version, we use a simple filtering strategy:
 
 This gives a usable WordNet synonym graph aligned with the GloVe vocabulary.
 
+
 ### Check The Data Pipeline
 
 Run a smaller check with the first 50,000 GloVe words:
 
 ```bash
-python3 prepare_wn_syn.py --max-words 50000
+python3 prepare_wordnet.py --relations syn --max-words 50000
 ```
 
-Run the full version with:
+Run the full WN_syn version with:
 
 ```bash
-python3 prepare_wn_syn.py
+python3 prepare_wordnet.py --relations syn
 ```
 
+Run the WN_all version with:
+
+```bash
+python3 prepare_wordnet.py --relations all
+```
 ----------------------------07/06/2025_update------------------------------
 
 ## Core Retrofitting Implementation
