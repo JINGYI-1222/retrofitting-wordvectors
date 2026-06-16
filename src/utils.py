@@ -1,17 +1,19 @@
 from pathlib import Path
-
 import numpy as np
 
 
 def load_text_embeddings(path: str | Path, max_words: int | None = None) -> dict[str, np.ndarray]:
-    """Load a text embedding file, for example a GloVe file."""
+    """Load a text embedding file, for example GloVe or fastText .vec."""
     embeddings = {}
     path = Path(path)
 
     with path.open("r", encoding="utf-8") as handle:
-        for line in handle:
+        for line_number, line in enumerate(handle):
             parts = line.strip().split()
             if len(parts) < 2:
+                continue
+
+            if line_number == 0 and len(parts) == 2 and parts[0].isdigit() and parts[1].isdigit():
                 continue
 
             word = parts[0]
