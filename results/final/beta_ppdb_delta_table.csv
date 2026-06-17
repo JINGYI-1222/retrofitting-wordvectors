@@ -1,0 +1,4 @@
+graph_variant,beta_strategy,RG-65,SimLex-999,WS-353
+PPDB,constant,-0.3684,-0.0402,-0.5745
+PPDB,inverse_degree,0.0449,0.0875,-0.0091
+PPDB,symmetric_degree,0.0397,0.1092,0.0365

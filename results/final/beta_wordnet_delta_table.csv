@@ -1,0 +1,7 @@
+graph_variant,beta_strategy,RG-65,SimLex-999,WS-353
+WN_all,constant,-0.0761,-0.1241,-0.5042
+WN_all,inverse_degree,0.0814,0.0915,0.0207
+WN_all,symmetric_degree,0.0975,0.1375,0.0537
+WN_syn,constant,-0.0713,-0.0194,-0.1828
+WN_syn,inverse_degree,0.0208,0.075,0.0238
+WN_syn,symmetric_degree,0.0271,0.0987,0.0415

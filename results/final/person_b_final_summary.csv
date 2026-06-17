@@ -1,0 +1,16 @@
+experiment,graph_variant,beta_strategy,RG-65,SimLex-999,WS-353,alpha
+beta_wordnet,WN_all,constant,-0.0761,-0.1241,-0.5042,
+beta_wordnet,WN_all,inverse_degree,0.0814,0.0915,0.0207,
+beta_wordnet,WN_all,symmetric_degree,0.0975,0.1375,0.0537,
+beta_wordnet,WN_syn,constant,-0.0713,-0.0194,-0.1828,
+beta_wordnet,WN_syn,inverse_degree,0.0208,0.075,0.0238,
+beta_wordnet,WN_syn,symmetric_degree,0.0271,0.0987,0.0415,
+beta_ppdb,PPDB,constant,-0.3684,-0.0402,-0.5745,
+beta_ppdb,PPDB,inverse_degree,0.0449,0.0875,-0.0091,
+beta_ppdb,PPDB,symmetric_degree,0.0397,0.1092,0.0365,
+alpha_wordnet_syn_inverse_degree,WN_syn,inverse_degree,0.0142,0.0871,0.0062,0.5
+alpha_wordnet_syn_inverse_degree,WN_syn,inverse_degree,0.0208,0.075,0.0238,1.0
+alpha_wordnet_syn_inverse_degree,WN_syn,inverse_degree,0.0248,0.0538,0.0227,2.0
+alpha_wordnet_all_symmetric_degree,WN_all,symmetric_degree,0.115,0.1485,0.0189,0.5
+alpha_wordnet_all_symmetric_degree,WN_all,symmetric_degree,0.0975,0.1375,0.0537,1.0
+alpha_wordnet_all_symmetric_degree,WN_all,symmetric_degree,0.0679,0.1016,0.0445,2.0
