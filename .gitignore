@@ -22,3 +22,9 @@ models/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !models/.gitkeep
+
+
+logs/
+
+datasets/wolf/*.xml
+datasets/wolf/*.bz2

@@ -1,0 +1,10 @@
+graph_variant,beta_strategy,dataset,original_score,retrofitted_score,delta,evaluated_pairs,total_pairs,coverage
+PPDB,inverse_degree,WS-353,0.6085,0.5994,-0.0091,353,353,1.0
+PPDB,inverse_degree,SimLex-999,0.3705,0.458,0.0875,999,999,1.0
+PPDB,inverse_degree,RG-65,0.7695,0.8144,0.0449,65,65,1.0
+PPDB,constant,WS-353,0.6085,0.0341,-0.5745,353,353,1.0
+PPDB,constant,SimLex-999,0.3705,0.3303,-0.0402,999,999,1.0
+PPDB,constant,RG-65,0.7695,0.4012,-0.3684,65,65,1.0
+PPDB,symmetric_degree,WS-353,0.6085,0.645,0.0365,353,353,1.0
+PPDB,symmetric_degree,SimLex-999,0.3705,0.4797,0.1092,999,999,1.0
+PPDB,symmetric_degree,RG-65,0.7695,0.8092,0.0397,65,65,1.0
