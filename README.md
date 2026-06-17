@@ -2,90 +2,193 @@
 
 This project reproduces the retrofitting method from Faruqui et al. (2015).
 
-## PART A. Data Loading and Preprocessing
-
-This module prepares the data for retrofitting.
-
-The first version uses（`WN_syn = synonyms only`）:
+## Data processing Structure
 
 ```text
-GloVe 6B 300d + English WordNet synonyms
+project/
+├── README.md                         # project overview and running commands
+│
+├── src/
+│   ├── utils.py                      # load/save embeddings, cosine similarity
+│   └── preprocessing.py              # build semantic graphs and filter OOV words
+│
+├── prepare_wordnet.py                # English GloVe + WordNet
+├── prepare_PPDB.py                   # English GloVe + PPDB
+├── prepare_french.py                 # French fastText + WOLF
+├── download_french_resources.py      # download French fastText and WOLF
+│
+├── models/
+│   ├── glove.6B.300d.txt             # English pretrained embeddings
+│   └── cc.fr.300.vec                 # French pretrained embeddings
+│
+└── datasets/
+    ├── ppdb/
+    │   └── ppdb-xl.txt               # English paraphrase lexicon
+    └── wolf/
+        └── wolf-1.0b4.xml            # French WordNet lexical resource
 ```
 
-This corresponds to the paper's `WN_syn` setting.
+`models/` contains pretrained word embeddings.
 
-It prepares:
+`datasets/` contains semantic lexical resources.
+
+## Data Loading and Preprocessing
+
+This part prepares the data objects used by the retrofitting algorithm:
 
 ```python
 embeddings: dict[str, np.ndarray]
 graph: dict[str, set[str]]
 ```
 
+`embeddings` stores the original pretrained word vectors.
 
-### Files
+`graph` stores the semantic neighbors from WordNet, WOLF, or PPDB.
+
+## Current Data Combinations
+
+English:
 
 ```text
-src/utils.py              # load embeddings, save embeddings, cosine similarity
-src/preprocessing.py      # build WordNet graph, filter OOV words
-
-prepare_wordnet.py         # checks full GloVe 300d + WordNet synonyms/all, we can merge it at the end
+GloVe 6B 300d + English WordNet synonyms
+GloVe 6B 300d + English WordNet synonyms + hypernyms + hyponyms
+GloVe 6B 300d + PPDB
 ```
 
-### Data Source
-
-Download GloVe from the [Stanford GloVe project page](https://nlp.stanford.edu/projects/glove/).
-
-Use the pretrained vectors named:
-
-**Wikipedia 2014 + Gigaword 5**  
-`glove.6B.zip`
-
-Extract this file:
+French:
 
 ```text
+French fastText 300d + WOLF synonyms
+French fastText 300d + WOLF synonyms + hypernym links
+```
+
+## Files
+
+```text
+src/utils.py                  # load/save embeddings, cosine similarity
+src/preprocessing.py          # build semantic graphs and filter OOV words
+
+prepare_wordnet.py            # English GloVe + WordNet
+prepare_PPDB.py               # English GloVe + PPDB
+download_french_resources.py  # download French fastText + WOLF
+prepare_french.py             # French fastText + WOLF
+```
+
+## Data Sources
+
+English GloVe:
+
+[Stanford GloVe project page](https://nlp.stanford.edu/projects/glove/)
+
+Use:
+
+```text
+Wikipedia 2014 + Gigaword 5
 glove.6B.300d.txt
 ```
 
-Place it at models:
+Place it at:
 
 ```text
 models/glove.6B.300d.txt
 ```
 
-The GloVe file is not uploaded to GitHub because it is too large.
+French fastText:
 
-### OOV Handling
+[fastText word vectors for 157 languages](https://fasttext.cc/docs/en/crawl-vectors.html)
 
-Some words appear in WordNet but do not have a GloVe vector. Since retrofitting needs an initial vector for each updated word, these words cannot be directly updated.
+The download script prepares:
 
-In this first version, we use a simple filtering strategy:
-
-- keep only words that appear in the GloVe vocabulary;
-- remove WordNet edges whose neighbor does not have a GloVe vector;
-- remove graph nodes that have no remaining neighbors after filtering.
-
-This gives a usable WordNet synonym graph aligned with the GloVe vocabulary.
-
-
-### Check The Data Pipeline
-
-Run a smaller check with the first 50,000 GloVe words:
-
-```bash
-python3 prepare_wordnet.py --relations syn --max-words 50000
+```text
+models/cc.fr.300.vec
 ```
 
-Run the full WN_syn version with:
+French WOLF:
+
+[WOLF French WordNet](https://almanach.inria.fr/software_and_resources/downloads/wolf-1.0b4.xml.bz2)
+
+The download script prepares:
+
+```text
+datasets/wolf/wolf-1.0b4.xml
+```
+
+PPDB:
+
+Place the PPDB file at:
+
+```text
+datasets/ppdb/ppdb-xl.txt
+```
+
+Folder convention:
+
+```text
+models/    pretrained word embeddings
+datasets/  semantic lexical resources
+```
+
+Large resource files are not uploaded to GitHub.
+
+## OOV Handling
+
+The same OOV strategy is used for WordNet, WOLF, and PPDB.
+
+Some words appear in a semantic lexicon but do not have a pretrained vector. Since retrofitting needs an initial vector for each updated word, these words cannot be directly updated.
+
+We therefore:
+
+- build the raw semantic graph;
+- keep only words that appear in the embedding vocabulary;
+- remove edges connected to words without pretrained vectors;
+- remove graph nodes that have no remaining neighbors.
+
+This gives a usable graph aligned with the embedding vocabulary.
+
+## Run
+
+English WordNet synonyms:
 
 ```bash
 python3 prepare_wordnet.py --relations syn
 ```
 
-Run the WN_all version with:
+English WordNet all:
 
 ```bash
 python3 prepare_wordnet.py --relations all
 ```
+
+English PPDB:
+
+```bash
+python3 prepare_PPDB.py
+```
+
+Download French resources:
+
+```bash
+python3 download_french_resources.py
+```
+
+French WOLF synonyms:
+
+```bash
+python3 prepare_french.py --relations syn
+```
+
+French WOLF all:
+
+```bash
+python3 prepare_french.py --relations all
+```
+
+(option)For quick tests, add:
+
+```bash
+--max-words 50000
+```
+
 ----------------------------07/06/2025_update------------------------------
 
 ## Core Retrofitting Implementation
