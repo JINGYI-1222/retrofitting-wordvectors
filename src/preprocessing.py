@@ -272,6 +272,6 @@ def report_oov(graph: dict[str, set[str]], embeddings: dict[str, object]) -> dic
     return {
         "embedding_vocab_size": len(vocab),
         "semantic_graph_vocab_size": len(graph_words),
-        "oov_after_filtering": len(graph_words - vocab),
+        "oov_words": len(graph_words - vocab),
         "usable_graph_nodes": len(graph_words & vocab),
     }
