@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from src.retrofit import retrofit_vectors
 
@@ -146,3 +147,84 @@ def test_accepts_set_neighbour_graph():
 
     assert set(retrofitted_vectors) == {"good", "nice"}
     assert stats["words_updated"] == 2
+
+
+def test_constant_beta_differs_from_inverse_degree_for_multiple_neighbours():
+    original_vectors = {
+        "center": np.array([0.0]),
+        "left": np.array([2.0]),
+        "right": np.array([4.0]),
+    }
+    graph = {
+        "center": ["left", "right"],
+        "left": [],
+        "right": [],
+    }
+
+    inverse_degree_vectors, _ = retrofit_vectors(
+        original_vectors,
+        graph,
+        num_iters=1,
+        alpha=1.0,
+        beta_strategy="inverse_degree",
+    )
+    constant_vectors, _ = retrofit_vectors(
+        original_vectors,
+        graph,
+        num_iters=1,
+        alpha=1.0,
+        beta_strategy="constant",
+    )
+
+    np.testing.assert_allclose(
+        inverse_degree_vectors["center"], np.array([1.5])
+    )
+    np.testing.assert_allclose(constant_vectors["center"], np.array([2.0]))
+
+
+def test_symmetric_degree_uses_current_and_neighbour_degrees():
+    original_vectors = {
+        "center": np.array([0.0]),
+        "left": np.array([2.0]),
+        "right": np.array([4.0]),
+        "extra": np.array([10.0]),
+    }
+    graph = {
+        "center": ["left", "right"],
+        "left": ["center"],
+        "right": ["center", "extra"],
+        "extra": ["right"],
+    }
+
+    retrofitted_vectors, _ = retrofit_vectors(
+        original_vectors,
+        graph,
+        num_iters=1,
+        alpha=1.0,
+        beta_strategy="symmetric_degree",
+    )
+
+    beta_center_left = 1.0 / np.sqrt(2 * 1)
+    beta_center_right = 1.0 / np.sqrt(2 * 2)
+    expected_center = (
+        beta_center_left * original_vectors["left"]
+        + beta_center_right * original_vectors["right"]
+    ) / (1.0 + beta_center_left + beta_center_right)
+
+    np.testing.assert_allclose(retrofitted_vectors["center"], expected_center)
+
+
+def test_unknown_beta_strategy_raises_value_error():
+    original_vectors = {
+        "good": np.array([1.0]),
+    }
+    graph = {
+        "good": [],
+    }
+
+    with pytest.raises(ValueError):
+        retrofit_vectors(
+            original_vectors,
+            graph,
+            beta_strategy="unknown",
+        )

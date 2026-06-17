@@ -19,8 +19,15 @@ def retrofit_vectors(
     The update is synchronous: each iteration reads neighbour vectors from
     the previous iteration and writes updated vectors into a fresh dictionary.
     """
-    if beta_strategy != "inverse_degree":
-        raise ValueError("Only beta_strategy='inverse_degree' is supported.")
+    if beta_strategy not in {
+        "inverse_degree",
+        "constant",
+        "symmetric_degree",
+    }:
+        raise ValueError(
+            "beta_strategy must be 'inverse_degree', 'constant', "
+            "or 'symmetric_degree'."
+        )
 
     valid_neighbours_by_word = {}
     oov_neighbours_skipped = 0
@@ -70,13 +77,23 @@ def retrofit_vectors(
                 next_vectors[word] = original_vector.copy()
                 continue
 
-            beta = 1.0 / len(valid_neighbours)
             neighbour_sum = np.zeros_like(original_vector, dtype=float)
+            beta_sum = 0.0
+            degree_i = max(1, len(valid_neighbours))
 
             for neighbour in valid_neighbours:
-                neighbour_sum += beta * previous_vectors[neighbour]
+                if beta_strategy == "inverse_degree":
+                    beta = 1.0 / len(valid_neighbours)
+                elif beta_strategy == "constant":
+                    beta = 1.0
+                else:
+                    degree_j = max(1, len(valid_neighbours_by_word[neighbour]))
+                    beta = 1.0 / np.sqrt(degree_i * degree_j)
 
-            denominator = alpha + beta * len(valid_neighbours)
+                neighbour_sum += beta * previous_vectors[neighbour]
+                beta_sum += beta
+
+            denominator = alpha + beta_sum
             next_vectors[word] = (
                 alpha * original_vector + neighbour_sum
             ) / denominator
