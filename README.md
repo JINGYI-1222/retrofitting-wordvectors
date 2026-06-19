@@ -2,7 +2,7 @@
 
 This project reproduces the retrofitting method from Faruqui et al. (2015).
 
-## Data processing Structure
+## Project Structure
 
 ```text
 project/
@@ -13,12 +13,16 @@ project/
 │   └── preprocessing.py              # build semantic graphs and filter OOV words
 │
 ├── prepare_wordnet.py                # English GloVe + WordNet
+├── prepare_word2vec.py               # English Word2Vec + WordNet
 ├── prepare_PPDB.py                   # English GloVe + PPDB
 ├── prepare_french.py                 # French fastText + WOLF
+├── download_word2vec.py              # download English Word2Vec
 ├── download_french_resources.py      # download French fastText and WOLF
+
 │
 ├── models/
 │   ├── glove.6B.300d.txt             # English pretrained embeddings
+│   ├── GoogleNews-vectors-negative300.bin.gz  # English Word2Vec embeddings
 │   └── cc.fr.300.vec                 # French pretrained embeddings
 │
 └── datasets/
@@ -53,6 +57,8 @@ English:
 GloVe 6B 300d + English WordNet synonyms
 GloVe 6B 300d + English WordNet synonyms + hypernyms + hyponyms
 GloVe 6B 300d + PPDB
+Word2Vec GoogleNews 300d + English WordNet synonyms
+Word2Vec GoogleNews 300d + English WordNet synonyms + hypernyms + hyponyms
 ```
 
 French:
@@ -69,7 +75,9 @@ src/utils.py                  # load/save embeddings, cosine similarity
 src/preprocessing.py          # build semantic graphs and filter OOV words
 
 prepare_wordnet.py            # English GloVe + WordNet
+prepare_word2vec.py           # English Word2Vec + WordNet
 prepare_PPDB.py               # English GloVe + PPDB
+download_word2vec.py          # download English Word2Vec
 download_french_resources.py  # download French fastText + WOLF
 prepare_french.py             # French fastText + WOLF
 ```
@@ -91,6 +99,26 @@ Place it at:
 
 ```text
 models/glove.6B.300d.txt
+```
+
+English Word2Vec:
+
+Use the GoogleNews pretrained vectors:
+
+```text
+GoogleNews-vectors-negative300.bin.gz
+```
+
+Place it at:
+
+```text
+models/GoogleNews-vectors-negative300.bin.gz
+```
+
+Or download it with:
+
+```bash
+python3 download_word2vec.py
 ```
 
 French fastText:
@@ -165,6 +193,18 @@ English PPDB:
 python3 prepare_PPDB.py
 ```
 
+English Word2Vec WordNet synonyms:
+
+```bash
+python3 prepare_word2vec.py --relations syn
+```
+
+English Word2Vec WordNet all:
+
+```bash
+python3 prepare_word2vec.py --relations all
+```
+
 Download French resources:
 
 ```bash
@@ -183,12 +223,11 @@ French WOLF all:
 python3 prepare_french.py --relations all
 ```
 
-(option)For quick tests, add:
+For quick tests, add:
 
 ```bash
 --max-words 50000
 ```
-
 ----------------------------07/06/2025_update------------------------------
 
 ## Core Retrofitting Implementation
