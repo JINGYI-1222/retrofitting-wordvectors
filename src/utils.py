@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import numpy as np
 
 
@@ -24,6 +25,25 @@ def load_text_embeddings(path: str | Path, max_words: int | None = None) -> dict
                 break
 
     return embeddings
+
+
+def load_word2vec_binary(path: str | Path, max_words: int | None = None) -> dict[str, np.ndarray]:
+    """Load a binary Word2Vec file, for example GoogleNews vectors."""
+    try:
+        from gensim.models import KeyedVectors
+    except ImportError as exc:
+        raise RuntimeError("gensim is required to load binary Word2Vec files.") from exc
+
+    model = KeyedVectors.load_word2vec_format(
+        str(path),
+        binary=True,
+        limit=max_words,
+    )
+
+    return {
+        word: model[word].astype(np.float64)
+        for word in model.index_to_key
+    }
 
 
 def save_text_embeddings(embeddings: dict[str, np.ndarray], path: str | Path) -> None:
